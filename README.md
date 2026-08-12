@@ -30,6 +30,10 @@ Install from the Figma Community or:
 2. In Figma: Plugins → Development → Import plugin from manifest
 3. Select the manifest.json file
 
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## Support
 
 For issues or feature requests, please contact [your contact info]
