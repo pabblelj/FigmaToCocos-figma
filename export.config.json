@@ -1,0 +1,31 @@
+{
+  "export": {
+    "includeHiddenLayers": false,
+    "imageScale": 2,
+    "imageFormat": "png",
+    "zipExtension": ".figma2cocos.zip"
+  },
+  "font": {
+    "mode": "system",
+    "preserveFigmaFontName": false
+  },
+  "effects": {
+    "shadow": "rasterize",
+    "blur": "rasterize",
+    "blendMode": "discard"
+  },
+  "coordinates": {
+    "target": "cocos",
+    "origin": "parent-center",
+    "yAxis": "up",
+    "anchor": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "output": {
+    "sceneFile": "scene.json",
+    "imageDirectory": "images"
+  }
+}
+

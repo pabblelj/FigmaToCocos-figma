@@ -1,0 +1,776 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--figma-color-text, #1f1f1f);
+      background: var(--figma-color-bg, #ffffff);
+    }
+
+    main {
+      width: 100%;
+      max-width: 100%;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: var(--figma-color-text-secondary, #666666);
+      line-height: 1.45;
+    }
+
+    fieldset {
+      min-width: 0;
+      max-width: 100%;
+      margin: 0 0 14px;
+      padding: 12px;
+      border: 1px solid var(--figma-color-border, #d9d9d9);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    legend {
+      padding: 0 4px;
+      font-weight: 600;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      color: var(--figma-color-text, #1f1f1f);
+    }
+
+    .row label {
+      flex: 1;
+      min-width: 0;
+    }
+
+    select,
+    input[type="number"] {
+      min-width: 84px;
+      height: 28px;
+      padding: 0 8px;
+      color: var(--figma-color-text, #1f1f1f);
+      background: var(--figma-color-bg-secondary, #f5f5f5);
+      border: 1px solid var(--figma-color-border, #d9d9d9);
+      border-radius: 4px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 32px;
+    }
+
+    .status {
+      min-height: 36px;
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--figma-color-border, #d9d9d9);
+      border-radius: 6px;
+      color: var(--figma-color-text-secondary, #666666);
+      line-height: 1.35;
+    }
+
+    .progress {
+      display: none;
+      margin: -4px 0 14px;
+    }
+
+    .progress.visible {
+      display: block;
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      color: var(--figma-color-text-secondary, #666666);
+      line-height: 1.35;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--figma-color-bg-secondary, #eeeeee);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--figma-color-bg-brand, #18a0fb);
+      transition: width 160ms ease;
+    }
+
+    .error {
+      color: var(--figma-color-text-danger, #b00020);
+    }
+
+    .preview-strip {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 100%;
+      min-height: 116px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 2px 0 8px;
+      scrollbar-width: thin;
+      cursor: grab;
+      touch-action: pan-x;
+      user-select: none;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+
+    .preview-strip.dragging {
+      cursor: grabbing;
+    }
+
+    .preview-strip.dragging img {
+      pointer-events: none;
+    }
+
+    .preview-card {
+      flex: 0 0 96px;
+      min-width: 96px;
+    }
+
+    .preview-image-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 88px;
+      height: 88px;
+      border: 1px solid var(--figma-color-border, #d9d9d9);
+      border-radius: 6px;
+      background:
+        linear-gradient(45deg, rgba(127, 127, 127, 0.16) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(127, 127, 127, 0.16) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(127, 127, 127, 0.16) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(127, 127, 127, 0.16) 75%);
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+      background-size: 16px 16px;
+    }
+
+    .preview-image-wrap img {
+      display: block;
+      max-width: 80px;
+      max-height: 80px;
+      object-fit: contain;
+    }
+
+    .preview-name,
+    .preview-path,
+    .preview-empty {
+      color: var(--figma-color-text-secondary, #666666);
+      line-height: 1.35;
+    }
+
+    .preview-name {
+      width: 88px;
+      margin-top: 6px;
+      color: var(--figma-color-text, #1f1f1f);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .preview-path {
+      width: 88px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+
+    .preview-empty {
+      display: flex;
+      align-items: center;
+      min-height: 88px;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    button {
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--figma-color-border, #d9d9d9);
+      border-radius: 5px;
+      color: var(--figma-color-text, #1f1f1f);
+      background: var(--figma-color-bg, #ffffff);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.primary {
+      color: var(--figma-color-text-onbrand, #ffffff);
+      background: var(--figma-color-bg-brand, #18a0fb);
+      border-color: var(--figma-color-bg-brand, #18a0fb);
+    }
+
+    .actions button {
+      align-self: flex-end;
+    }
+
+    button:disabled {
+      cursor: default;
+      opacity: 0.55;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <p class="subtitle">将当前选中的图层导出为包含 scene.json 和图片资源的 zip 包。</p>
+
+    <div id="status" class="status">等待选择图层...</div>
+
+    <fieldset>
+      <legend>图层</legend>
+      <label>
+        <input id="include-hidden" type="checkbox">
+        包含隐藏图层
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>字体</legend>
+      <div class="row">
+        <label>
+          <input id="font-system" name="font-mode" type="radio" value="system" checked>
+          使用系统字体
+        </label>
+        <label>
+          <input id="font-figma" name="font-mode" type="radio" value="figma">
+          保留 Figma 字体名称
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>增强效果</legend>
+      <div class="row">
+        <span>阴影</span>
+        <select id="effect-shadow">
+          <option value="rasterize" selected>栅格化</option>
+          <option value="discard">丢弃</option>
+        </select>
+      </div>
+      <div class="row">
+        <span>模糊</span>
+        <select id="effect-blur">
+          <option value="rasterize" selected>栅格化</option>
+          <option value="discard">丢弃</option>
+        </select>
+      </div>
+      <div class="row">
+        <span>混合模式</span>
+        <select id="effect-blend">
+          <option value="discard" selected>丢弃</option>
+          <option value="rasterize">栅格化</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset id="preview-section" style="display: none;">
+      <legend>导出图片预览</legend>
+      <div id="preview-list" class="preview-strip">
+        <div class="preview-empty">暂无需要导出的图片</div>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <div id="progress" class="progress">
+        <div class="progress-head">
+          <span id="progress-stage">准备导出</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+      <button id="build" class="primary">构建</button>
+      <button id="export" class="primary" style="display: none;">导出 Zip</button>
+    </div>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const progressEl = document.getElementById("progress");
+    const progressStage = document.getElementById("progress-stage");
+    const progressPercent = document.getElementById("progress-percent");
+    const progressFill = document.getElementById("progress-fill");
+    const buildButton = document.getElementById("build");
+    const exportButton = document.getElementById("export");
+    const previewSection = document.getElementById("preview-section");
+    const previewList = document.getElementById("preview-list");
+
+    let selectedCount = 0;
+    let previewRequestId = 0;
+    let previewTimer = null;
+    let previewUrls = [];
+    let zipBuilder = null;
+    let isBuilt = false;
+
+    window.onmessage = async (event) => {
+      const message = event.data.pluginMessage;
+      if (!message) {
+        return;
+      }
+
+      if (message.type === "selection") {
+        selectedCount = message.count;
+        buildButton.disabled = selectedCount === 0;
+        statusEl.className = "status";
+        statusEl.textContent = selectedCount === 0
+          ? "请选择一个 Frame 或图层后再导出。"
+          : `已选择 ${selectedCount} 个图层：${message.names.slice(0, 3).join(", ")}${message.names.length > 3 ? "..." : ""}`;
+
+        // 节点切换时，隐藏预览和导出按钮
+        isBuilt = false;
+        previewSection.style.display = "none";
+        exportButton.style.display = "none";
+        buildButton.style.display = "inline-block";
+      }
+
+      if (message.type === "export-progress") {
+        exportButton.disabled = true;
+        setProgress(message.percent, message.stage, message.exportedImages, message.totalImages);
+        statusEl.className = "status";
+        statusEl.textContent = "正在导出选中的图层...";
+      }
+
+      if (message.type === "export-file") {
+        if (zipBuilder) {
+          zipBuilder.addFile(message.file);
+        }
+      }
+
+      if (message.type === "export-error") {
+        exportButton.disabled = selectedCount === 0;
+        hideProgress();
+        statusEl.className = "status error";
+        statusEl.textContent = message.message;
+      }
+
+      if (message.type === "preview-ready") {
+        if (message.requestId !== previewRequestId) {
+          return;
+        }
+        renderPreview(message.items);
+        // 预览生成完成后，显示预览区域和导出按钮
+        isBuilt = true;
+        previewSection.style.display = "block";
+        exportButton.style.display = "inline-block";
+        exportButton.disabled = false;
+        buildButton.style.display = "none";
+      }
+
+      if (message.type === "preview-error") {
+        if (message.requestId !== previewRequestId) {
+          return;
+        }
+        renderPreviewError(message.message);
+      }
+
+      if (message.type === "export-ready") {
+        const payload = message.payload;
+        setProgress(98, "正在打包 zip", null, null);
+        if (!zipBuilder) {
+          zipBuilder = createZipBuilder();
+        }
+        zipBuilder.addFile(payload.sceneFile);
+        const fileCount = zipBuilder.getFileCount();
+        const zipParts = zipBuilder.finish();
+        setProgress(100, "下载 zip", null, null);
+        downloadParts(payload.fileName, zipParts, "application/zip");
+        exportButton.disabled = selectedCount === 0;
+        statusEl.className = "status";
+        statusEl.textContent = `导出完成：${fileCount} 个文件，${payload.scene.warnings.length} 条提示。`;
+        zipBuilder = null;
+      }
+    };
+
+    buildButton.onclick = () => {
+      if (selectedCount === 0) return;
+      buildButton.disabled = true;
+      statusEl.className = "status";
+      statusEl.textContent = "正在生成预览...";
+      requestPreview();
+    };
+
+    exportButton.onclick = () => {
+      exportButton.disabled = true;
+      zipBuilder = createZipBuilder();
+      statusEl.className = "status";
+      statusEl.textContent = "正在导出选中的图层...";
+      setProgress(1, "准备导出", null, null);
+      parent.postMessage({
+        pluginMessage: {
+          type: "export",
+          options: readOptions(),
+        },
+      }, "*");
+    };
+
+    document.querySelectorAll("input, select").forEach((control) => {
+      control.addEventListener("change", () => {
+        // 配置改变时，隐藏预览和导出按钮，需要重新构建
+        if (isBuilt) {
+          isBuilt = false;
+          previewSection.style.display = "none";
+          exportButton.style.display = "none";
+          buildButton.style.display = "inline-block";
+          buildButton.disabled = selectedCount === 0;
+        }
+      });
+    });
+
+    enableHorizontalDrag(previewList);
+
+    function setProgress(percent, stage, exportedImages, totalImages) {
+      const safePercent = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
+      progressEl.classList.add("visible");
+      progressFill.style.width = `${safePercent}%`;
+      progressPercent.textContent = `${safePercent}%`;
+
+      if (typeof exportedImages === "number" && typeof totalImages === "number" && totalImages > 0) {
+        progressStage.textContent = `${stage}（${exportedImages}/${totalImages}）`;
+      } else {
+        progressStage.textContent = stage || "正在导出";
+      }
+    }
+
+    function hideProgress() {
+      progressEl.classList.remove("visible");
+      progressFill.style.width = "0%";
+      progressPercent.textContent = "0%";
+      progressStage.textContent = "准备导出";
+    }
+
+    function requestPreview() {
+      previewTimer = null;
+
+      if (selectedCount === 0) {
+        renderPreview([]);
+        return;
+      }
+
+      previewRequestId += 1;
+      previewList.innerHTML = '<div class="preview-empty">正在生成预览...</div>';
+      parent.postMessage({
+        pluginMessage: {
+          type: "preview",
+          requestId: previewRequestId,
+          options: readOptions(),
+        },
+      }, "*");
+    }
+
+    function renderPreview(items) {
+      clearPreviewUrls();
+
+      if (!items || items.length === 0) {
+        previewList.innerHTML = '<div class="preview-empty">暂无需要导出的图片</div>';
+        return;
+      }
+
+      previewList.innerHTML = "";
+      for (const item of items) {
+        const card = document.createElement("div");
+        card.className = "preview-card";
+
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "preview-image-wrap";
+
+        const image = document.createElement("img");
+        image.alt = item.name;
+        image.title = `${item.name}\n${item.path}`;
+        image.src = createObjectUrl(item.bytes, "image/png");
+        imageWrap.appendChild(image);
+
+        const name = document.createElement("div");
+        name.className = "preview-name";
+        name.textContent = item.name;
+        name.title = item.name;
+
+        const path = document.createElement("div");
+        path.className = "preview-path";
+        path.textContent = item.path;
+        path.title = item.path;
+
+        card.appendChild(imageWrap);
+        card.appendChild(name);
+        card.appendChild(path);
+        previewList.appendChild(card);
+      }
+    }
+
+    function renderPreviewError(message) {
+      clearPreviewUrls();
+      previewList.innerHTML = "";
+      const error = document.createElement("div");
+      error.className = "preview-empty error";
+      error.textContent = message;
+      previewList.appendChild(error);
+    }
+
+    function createObjectUrl(bytes, mimeType) {
+      const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
+      previewUrls.push(url);
+      return url;
+    }
+
+    function clearPreviewUrls() {
+      for (const url of previewUrls) {
+        URL.revokeObjectURL(url);
+      }
+      previewUrls = [];
+    }
+
+    function enableHorizontalDrag(element) {
+      let isDragging = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+
+      element.addEventListener("pointerdown", (event) => {
+        if (event.button !== undefined && event.button !== 0) {
+          return;
+        }
+
+        event.preventDefault();
+        isDragging = true;
+        startX = event.clientX;
+        startScrollLeft = element.scrollLeft;
+        element.classList.add("dragging");
+        element.setPointerCapture(event.pointerId);
+      });
+
+      element.addEventListener("pointermove", (event) => {
+        if (!isDragging) {
+          return;
+        }
+
+        event.preventDefault();
+        element.scrollLeft = startScrollLeft - (event.clientX - startX);
+      });
+
+      element.addEventListener("pointerup", (event) => {
+        isDragging = false;
+        element.classList.remove("dragging");
+        if (element.hasPointerCapture(event.pointerId)) {
+          element.releasePointerCapture(event.pointerId);
+        }
+      });
+
+      element.addEventListener("pointercancel", () => {
+        isDragging = false;
+        element.classList.remove("dragging");
+      });
+
+      element.addEventListener("pointerleave", () => {
+        if (!isDragging) {
+          return;
+        }
+
+        isDragging = false;
+        element.classList.remove("dragging");
+      });
+
+      element.addEventListener("wheel", (event) => {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+          return;
+        }
+
+        event.preventDefault();
+        element.scrollLeft += event.deltaY;
+      }, { passive: false });
+    }
+
+    function readOptions() {
+      const fontMode = document.querySelector("input[name='font-mode']:checked").value;
+      return {
+        includeHiddenLayers: document.getElementById("include-hidden").checked,
+        imageScale: 1,
+        fontMode,
+        effects: {
+          shadow: document.getElementById("effect-shadow").value,
+          blur: document.getElementById("effect-blur").value,
+          blendMode: document.getElementById("effect-blend").value,
+        },
+      };
+    }
+
+    function createZipBuilder() {
+      const parts = [];
+      const centralParts = [];
+      let offset = 0;
+      let fileCount = 0;
+
+      return {
+        addFile(file) {
+          const nameBytes = utf8Bytes(file.path);
+          const data = file.bytes;
+          const crc = crc32(data);
+          const localHeader = concatBytes([
+            u32(0x04034b50),
+            u16(20),
+            u16(0x0800),
+            u16(0),
+            u16(0),
+            u16(0),
+            u32(crc),
+            u32(data.length),
+            u32(data.length),
+            u16(nameBytes.length),
+            u16(0),
+            nameBytes,
+          ]);
+
+          parts.push(localHeader, data);
+
+          const centralHeader = concatBytes([
+            u32(0x02014b50),
+            u16(20),
+            u16(20),
+            u16(0x0800),
+            u16(0),
+            u16(0),
+            u16(0),
+            u32(crc),
+            u32(data.length),
+            u32(data.length),
+            u16(nameBytes.length),
+            u16(0),
+            u16(0),
+            u16(0),
+            u16(0),
+            u32(0),
+            u32(offset),
+            nameBytes,
+          ]);
+
+          centralParts.push(centralHeader);
+          offset += localHeader.length + data.length;
+          fileCount += 1;
+        },
+
+        finish() {
+          const centralStart = offset;
+          const central = concatBytes(centralParts);
+          const end = concatBytes([
+            u32(0x06054b50),
+            u16(0),
+            u16(0),
+            u16(fileCount),
+            u16(fileCount),
+            u32(central.length),
+            u32(centralStart),
+            u16(0),
+          ]);
+
+          return [...parts, central, end];
+        },
+
+        getFileCount() {
+          return fileCount;
+        },
+      };
+    }
+
+    function downloadParts(fileName, parts, mimeType) {
+      const blob = new Blob(parts, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function utf8Bytes(value) {
+      return Array.from(new TextEncoder().encode(value));
+    }
+
+    function u16(value) {
+      return Uint8Array.of(value & 255, (value >>> 8) & 255);
+    }
+
+    function u32(value) {
+      return Uint8Array.of(value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255);
+    }
+
+    function concatBytes(parts) {
+      const length = parts.reduce((sum, part) => sum + part.length, 0);
+      const output = new Uint8Array(length);
+      let offset = 0;
+      for (const part of parts) {
+        output.set(part, offset);
+        offset += part.length;
+      }
+      return output;
+    }
+
+    function crc32(bytes) {
+      let crc = -1;
+      for (let i = 0; i < bytes.length; i += 1) {
+        crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 255];
+      }
+      return (crc ^ -1) >>> 0;
+    }
+
+    const CRC_TABLE = (() => {
+      const table = [];
+      for (let i = 0; i < 256; i += 1) {
+        let c = i;
+        for (let k = 0; k < 8; k += 1) {
+          c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        }
+        table[i] = c >>> 0;
+      }
+      return table;
+    })();
+  </script>
+</body>
+
+</html>
